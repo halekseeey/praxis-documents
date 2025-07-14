@@ -27,8 +27,6 @@ class DocsStore {
 		if (this.isInitialized) return;
 
 		const modules = import.meta.glob(`/src/content/**/*.md`);
-		console.log('Found modules:', Object.keys(modules).length);
-		console.log('Module paths:', Object.keys(modules));
 
 		const docs: DocItem[] = [];
 
@@ -68,15 +66,11 @@ class DocsStore {
 						external,
 						label
 					});
-					console.log('Added document:', { title, slug, href });
 				}
 			} catch (e) {
 				console.error(`Error processing ${path}:`, e);
 			}
 		}
-
-		console.log('Total documents processed:', docs.length);
-		console.log('Final documents:', docs);
 
 		this.documents = docs;
 		this.isInitialized = true;
