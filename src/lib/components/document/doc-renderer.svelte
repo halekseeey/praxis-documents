@@ -48,7 +48,7 @@
 			<div class=" sticky top-20 flex w-72 flex-col gap-4">
 				<div class="sidebar hidden overflow-x-hidden sm:block">
 					<TableOfContents />
-					<Separator />
+					<!-- <Separator /> -->
 				</div>
 				<div class="block sm:hidden">
 					<MobileTableOfContents />
