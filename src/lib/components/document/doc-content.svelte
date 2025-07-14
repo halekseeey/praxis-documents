@@ -18,24 +18,39 @@
 			if (block.closest('pre')?.classList.contains('shiki')) continue;
 
 			const code = block.textContent || '';
-			const language = block.getAttribute('class')?.replace('language-', '') || 'text';
+			let language = block.getAttribute('class')?.replace('language-', '') || 'text';
 
-			const highlightedCode = await highlighter.codeToHtml(code, {
-				lang: language,
-				theme: theme === 'dark' ? 'github-dark' : 'github-light'
-			});
+			// Normalize language names
+			if (['python3', 'py'].includes(language)) {
+				language = 'python';
+			}
 
-			const wrapper = block.closest('pre');
-			if (wrapper) {
-				// Extract the inner content of the highlighted code (inside the pre tag)
-				const tempDiv = document.createElement('div');
-				tempDiv.innerHTML = highlightedCode;
-				const innerContent = tempDiv.querySelector('.shiki')?.innerHTML || '';
+			try {
+				const highlightedCode = await highlighter.codeToHtml(code, {
+					lang: language,
+					theme: theme === 'dark' ? 'github-dark' : 'github-light'
+				});
 
-				// Keep the original pre tag but update its classes and content
-				wrapper.className = 'shiki shiki-wrapper not-prose';
-				wrapper.style.backgroundColor = theme === 'github-dark' ? '#0d1117' : '#f6f8fa';
-				wrapper.innerHTML = innerContent;
+				const wrapper = block.closest('pre');
+				if (wrapper) {
+					// Extract the inner content of the highlighted code (inside the pre tag)
+					const tempDiv = document.createElement('div');
+					tempDiv.innerHTML = highlightedCode;
+					const innerContent = tempDiv.querySelector('.shiki')?.innerHTML || '';
+
+					// Keep the original pre tag but update its classes and content
+					wrapper.className = 'shiki shiki-wrapper not-prose';
+					wrapper.style.backgroundColor = theme === 'github-dark' ? '#0d1117' : '#f6f8fa';
+					wrapper.innerHTML = innerContent;
+				}
+			} catch (error) {
+				console.warn(`Failed to highlight code block with language '${language}':`, error);
+				// Fallback to plain text highlighting
+				const wrapper = block.closest('pre');
+				if (wrapper) {
+					wrapper.className = 'shiki-wrapper not-prose';
+					wrapper.style.backgroundColor = theme === 'github-dark' ? '#0d1117' : '#f6f8fa';
+				}
 			}
 		}
 	}
@@ -50,6 +65,6 @@
 	});
 </script>
 
-<div class="prose prose-slate max-w-none dark:prose-invert" bind:this={contentRef}>
+<div class="prose prose-slate dark:prose-invert max-w-none" bind:this={contentRef}>
 	<data.doc />
 </div>

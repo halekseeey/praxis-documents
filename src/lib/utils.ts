@@ -1,10 +1,10 @@
-import { error } from "@sveltejs/kit";
-import { type ClassValue, clsx } from "clsx";
-import { twMerge } from "tailwind-merge";
-import type { DocResolver } from "./types/docs";
-import type { NavItem } from "./types/nav";
-import type { TransitionConfig } from "svelte/transition";
-import { cubicOut } from "svelte/easing";
+import { error } from '@sveltejs/kit';
+import { type ClassValue, clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+import type { DocResolver } from './types/docs';
+import type { NavItem } from './types/nav';
+import type { TransitionConfig } from 'svelte/transition';
+import { cubicOut } from 'svelte/easing';
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -22,22 +22,17 @@ export function styleToString(style: Record<string, number | string | undefined>
 	return Object.keys(style).reduce((str, key) => {
 		if (style[key] === undefined) return str;
 		return `${str}${key}:${style[key]};`;
-	}, "");
+	}, '');
 }
-
 
 export function flyAndScale(
 	node: Element,
 	params: FlyAndScaleParams = { y: -8, x: 0, start: 0.95, duration: 150 }
 ): TransitionConfig {
 	const style = getComputedStyle(node);
-	const transform = style.transform === "none" ? "" : style.transform;
+	const transform = style.transform === 'none' ? '' : style.transform;
 
-	const scaleConversion = (
-		valueA: number,
-		scaleA: [number, number],
-		scaleB: [number, number]
-	) => {
+	const scaleConversion = (valueA: number, scaleA: [number, number], scaleB: [number, number]) => {
 		const [minA, maxA] = scaleA;
 		const [minB, maxB] = scaleB;
 
@@ -57,10 +52,10 @@ export function flyAndScale(
 
 			return styleToString({
 				transform: `${transform} translate3d(${x}px, ${y}px, 0) scale(${scale})`,
-				opacity: t,
+				opacity: t
 			});
 		},
-		easing: cubicOut,
+		easing: cubicOut
 	};
 }
 
@@ -73,8 +68,26 @@ export async function getDoc(slug: string) {
 	const match = findMatch(slug, modules);
 	const doc = await match?.resolver?.();
 
-	if (!doc || !doc.metadata) {
+	if (!doc) {
 		error(404);
+	}
+
+	// If no metadata, create default metadata from the content
+	if (!doc.metadata) {
+		const filename = match?.path?.split('/').pop()?.replace('.md', '') || '';
+		const title = filename.charAt(0).toUpperCase() + filename.slice(1).replace(/[-_]/g, ' ');
+
+		// Create a new object with metadata instead of modifying the existing one
+		return {
+			...doc,
+			metadata: {
+				title,
+				description: '',
+				slug: slug,
+				component: true,
+				source: match?.path || ''
+			}
+		};
 	}
 
 	return doc;

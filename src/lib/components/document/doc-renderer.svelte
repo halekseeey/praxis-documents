@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import PromoCard from './promo-card.svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import Separator from '../ui/separator/separator.svelte';
 	import DocContent from './doc-content.svelte';
 	import DocHeader from './doc-header.svelte';
@@ -13,6 +12,12 @@
 	let { title, description, data }: { title: string; description: string; data: any } = $props();
 	let theme = $derived($mode);
 	let contentKey = $derived(`${theme}-${title}`);
+
+	let sidebar: HTMLElement | null = $state(null);
+	let sidebarContent: HTMLElement | null = $state(null);
+
+	// Cleanup function for event listeners
+	let cleanup: (() => void) | null = $state(null);
 
 	onMount(async () => {
 		highlighter = await createHighlighter({
@@ -27,30 +32,67 @@
 				'css',
 				'svelte',
 				'shell',
-				'tsx'
+				'tsx',
+				'python'
 			]
 		});
+
+		function handleScroll() {
+			if (!sidebar || !sidebarContent) return;
+			const scrollTop = window.scrollY;
+			const viewportHeight = window.innerHeight;
+			const contentHeight = sidebarContent.getBoundingClientRect().height;
+			const sidebarTop = sidebar.getBoundingClientRect().top + window.pageYOffset;
+
+			// If reached the bottom of the document, fix above the footer
+			if (scrollTop >= contentHeight - viewportHeight + sidebarTop) {
+				sidebarContent.style.transform = `translateY(-${contentHeight - viewportHeight + sidebarTop}px)`;
+				sidebarContent.style.position = 'fixed';
+			} else {
+				sidebarContent.style.transform = '';
+				sidebarContent.style.position = '';
+			}
+		}
+
+		window.addEventListener('scroll', handleScroll);
+		window.addEventListener('resize', handleScroll);
+
+		handleScroll();
+
+		cleanup = () => {
+			window.removeEventListener('scroll', handleScroll);
+			window.removeEventListener('resize', handleScroll);
+		};
+	});
+
+	onDestroy(() => {
+		if (cleanup) {
+			cleanup();
+		}
 	});
 </script>
 
 {#if highlighter}
 	<div class="flex flex-col gap-6 sm:flex-row">
-		<div>
+		<div class="min-w-0 flex-1 overflow-hidden">
 			<DocHeader {title} {description} />
+
 			{#key contentKey}
 				<DocContent {highlighter} {theme} {data} />
 			{/key}
 		</div>
 		<div>
-			<div class="sticky top-20 flex w-72 flex-col gap-4">
-				<div class="hidden sm:block">
-					<TableOfContents />
-					<Separator />
+			<div class="flex w-72 flex-col gap-4">
+				<div bind:this={sidebar} class="sidebar hidden overflow-x-hidden sm:block">
+					<div bind:this={sidebarContent} class="content-wrapper">
+						<TableOfContents />
+						<Separator />
+					</div>
 				</div>
 				<div class="block sm:hidden">
 					<MobileTableOfContents />
 				</div>
-				<PromoCard />
+				<!-- <PromoCard /> -->
 			</div>
 		</div>
 	</div>

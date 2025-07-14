@@ -6,14 +6,46 @@
 	import SocialMedia from '$lib/components/social-media.svelte';
 	import { Separator } from '$lib/components/ui/separator/index.js';
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
+	import { sidebarStore, sidebarActions } from '$lib/hooks/sidebar-store.svelte.js';
+	import { onMount } from 'svelte';
+
 	let { children }: { children: any } = $props();
+
+	let sidebarState = $derived($sidebarStore);
+
+	let withTransition = $state(false);
+
+	onMount(() => {
+		const checkMobile = () => {
+			const isMobile = window.innerWidth < 768;
+			sidebarActions.setMobile(isMobile);
+		};
+
+		checkMobile();
+		window.addEventListener('resize', checkMobile);
+
+		return () => {
+			window.removeEventListener('resize', checkMobile);
+		};
+	});
 </script>
 
-<Sidebar.Provider>
+<Sidebar.Provider
+	bind:open={sidebarState.isOpen}
+	onOpenChange={(isOpen) => {
+		withTransition = true;
+
+		sidebarActions.setOpen(isOpen);
+
+		setTimeout(() => {
+			withTransition = false;
+		}, 0);
+	}}
+>
 	<AppSidebar />
 	<Sidebar.Inset>
 		<header
-			class="sticky top-0 z-10 flex shrink-0 items-center justify-between gap-2 border-b bg-background px-4"
+			class="bg-background sticky top-0 z-10 flex shrink-0 items-center justify-between gap-2 border-b px-4"
 		>
 			<div class="flex h-16 items-center gap-2">
 				<Sidebar.Trigger class="-ml-1" />
@@ -29,7 +61,14 @@
 				<DarkModeToggle />
 			</div>
 		</header>
-		<div class="flex flex-col gap-4 p-4">
+		<div
+			class="flex flex-col gap-4 p-4 ease-linear"
+			class:duration-200={withTransition}
+			class:transition-all={withTransition}
+			style="max-width: {!sidebarState.isMobile && sidebarState.isOpen
+				? 'calc(100vw - 16rem)'
+				: '100vw'}"
+		>
 			{@render children()}
 		</div>
 	</Sidebar.Inset>
