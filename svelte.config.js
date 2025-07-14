@@ -37,7 +37,7 @@ const config = {
 				() => (tree) => {
 					const visit = (node) => {
 						if (node.type === 'image' && node.url && node.url.startsWith('images/')) {
-							node.url = `/images/${node.url}`;
+							node.url = `/${node.url}`;
 						}
 						if (node.children) node.children.forEach(visit);
 					};
