@@ -1,45 +1,16 @@
-import FlexSearch from 'flexsearch';
-import type { DocFile } from '$lib/types/docs';
-
-interface SearchDocument {
-	id: string;
-	title: string;
-	description: string;
-	content: string;
-	slug: string;
-}
+import { docsStore } from '$lib/stores/docs-store.svelte';
 
 interface SearchResult {
 	title: string;
 	slug: string;
-	description: string;
 }
-
-type FlexSearchDocument = {
-	id: string;
-	[key: string]: any;
-};
 
 class DocsSearch {
 	private static instance: DocsSearch;
-	private index: any; // Using any for index type to avoid complex FlexSearch typing
-	private documents: Map<string, SearchDocument>;
 	public searchResults = $state<SearchResult[]>([]);
 	public isSearching = $state<boolean>(false);
 
-	private constructor() {
-		this.index = new FlexSearch.Document({
-			document: {
-				id: 'id',
-				index: ['title', 'content'],
-				store: ['title', 'slug']
-			},
-			tokenize: 'forward',
-			context: true,
-			cache: true
-		});
-		this.documents = new Map();
-	}
+	private constructor() {}
 
 	public static getInstance(): DocsSearch {
 		if (!DocsSearch.instance) {
@@ -48,96 +19,63 @@ class DocsSearch {
 		return DocsSearch.instance;
 	}
 
-	public async addDocument(doc: DocFile, slug: string): Promise<void> {
-		if (!doc.default) return;
-
-		let title = '';
-		let description = '';
-
-		if (doc.metadata) {
-			title = doc.metadata.title;
-			description = doc.metadata.description || '';
-		} else {
-			// Extract title from slug as fallback
-			const slugParts = slug.split('/');
-			const fileName = slugParts[slugParts.length - 1];
-			title = fileName
-				.split('_')
-				.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-				.join(' ');
-		}
-
-		const searchDoc: SearchDocument = {
-			id: slug,
-			title: title,
-			description: description,
-			content: '',
-			slug: slug
-		};
-		this.documents.set(slug, searchDoc);
-		await this.index.add(searchDoc);
-	}
-
 	public async search(query: string): Promise<void> {
-		if (!query || query.length < 1) {
+		const trimmedQuery = query.trim();
+
+		if (!trimmedQuery || trimmedQuery.length < 1) {
 			this.searchResults = [];
 			this.isSearching = false;
 			return;
 		}
 
+		this.isSearching = true;
+
 		try {
-			const results: Array<{ field: string; result: Array<FlexSearchDocument> }> =
-				await this.index.search(query, {
-					limit: 10,
-					enrich: true
-				});
+			// Initialize docs store if not already done
+			await docsStore.initialize();
 
-			// Flatten and deduplicate results
-			const searchResults = new Set<string>();
+			const searchTerm = trimmedQuery.toLowerCase();
+			console.log('Searching for term:', `"${searchTerm}"`);
+
 			const formattedResults: SearchResult[] = [];
+			const documents = docsStore.getDocumentsForSearch();
 
-			results.forEach((result) => {
-				result.result.forEach((doc) => {
-					const docId = doc.id as string;
-					if (!searchResults.has(docId)) {
-						searchResults.add(docId);
-						const document = this.documents.get(docId);
-						if (document) {
-							formattedResults.push({
-								title: document.title,
-								slug: document.slug,
-								description: document.description
-							});
-						}
-					}
-				});
+			for (const document of documents) {
+				const title = document.title.toLowerCase();
+				if (searchTerm && title.includes(searchTerm)) {
+					formattedResults.push({
+						title: document.title,
+						slug: document.slug
+					});
+				}
+			}
+
+			// Simple sort by position of match
+			formattedResults.sort((a, b) => {
+				const aTitle = a.title.toLowerCase();
+				const bTitle = b.title.toLowerCase();
+
+				const aIndex = aTitle.indexOf(searchTerm);
+				const bIndex = bTitle.indexOf(searchTerm);
+
+				if (aIndex !== bIndex) return aIndex - bIndex;
+				return aTitle.localeCompare(bTitle);
 			});
 
-			this.searchResults = formattedResults;
+			// Update results in a single assignment to trigger reactivity
+			this.searchResults = formattedResults.slice(0, 10);
+			console.log('Search results:', this.searchResults.length, 'items');
+		} catch (error) {
+			console.error('Search error:', error);
+			this.searchResults = [];
 		} finally {
-			setTimeout(() => {
-				this.isSearching = false;
-			}, 500);
+			this.isSearching = false;
 		}
 	}
 
 	public async initializeSearchIndex(): Promise<void> {
-		const modules = import.meta.glob(['/src/content/**/*.md', '/src/content/**/*.svx'], {
-			eager: true
-		});
-
-		for (const [path, module] of Object.entries(modules)) {
-			try {
-				const doc = module as DocFile;
-				const slug = path
-					.replace('/src/content/', '')
-					.replace(/\.(md|svx)$/, '')
-					.replace(/\/index$/, '');
-				await this.addDocument(doc, slug);
-			} catch (e) {
-				console.error(`Error indexing ${path}:`, e);
-			}
-		}
+		// Initialize docs store if not already done
+		await docsStore.initialize();
 	}
 
 	public clearSearch(): void {

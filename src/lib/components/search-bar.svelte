@@ -4,15 +4,17 @@
 	import { docsSearch } from './doc-search.svelte';
 	import * as Command from '$lib/components/ui/command';
 	import { Search as SearchIcon, BookOpen, FileText } from 'lucide-svelte';
-	import Separator from './ui/separator/separator.svelte';
 
 	let open = $state(false);
 	let searchQuery = $state('');
 	let searchResults = $derived(docsSearch.searchResults);
+	let isSearching = $derived(docsSearch.isSearching);
 
 	$effect(() => {
 		if (searchQuery) {
 			docsSearch.search(searchQuery);
+		} else {
+			docsSearch.clearSearch();
 		}
 	});
 
@@ -20,7 +22,8 @@
 		searchQuery = '';
 		open = false;
 		docsSearch.clearSearch();
-		goto(`/docs/${slug}`);
+
+		goto(`/docs${slug}`);
 	}
 
 	onMount(() => {
@@ -40,6 +43,8 @@
 
 	function handleSearchClick() {
 		open = true;
+		searchQuery = '';
+		docsSearch.clearSearch();
 	}
 </script>
 
@@ -68,13 +73,13 @@
 			<Command.Empty class="py-6 text-center text-sm">
 				Start typing to search documentation...
 			</Command.Empty>
-		{:else if searchResults.length === 0}
-			<Command.Empty class="py-6 text-center text-sm">
-				No results found for "{searchQuery}"
-			</Command.Empty>
-		{:else if searchResults.length > 0}
+		{:else if isSearching}
+			<Command.Empty class="py-6 text-center text-sm">Searching...</Command.Empty>
+		{:else if docsSearch.searchResults.length === 0}
+			<Command.Empty class="py-6 text-center text-sm"></Command.Empty>
+		{:else if docsSearch.searchResults.length > 0}
 			<Command.Group heading="Documentation">
-				{#each searchResults as result}
+				{#each docsSearch.searchResults as result}
 					<Command.Item
 						onSelect={() => handleResultClick(result.slug)}
 						class="flex items-start gap-2 px-2 py-3"
@@ -82,9 +87,6 @@
 						<FileText class="mt-0.5 h-4 w-4 shrink-0" />
 						<div class="flex flex-col gap-1">
 							<span class="font-medium">{result.title}</span>
-							<span class="text-muted-foreground line-clamp-2 text-sm">
-								{result.description}
-							</span>
 						</div>
 					</Command.Item>
 				{/each}
@@ -93,7 +95,7 @@
 
 		{#if searchQuery === '' || searchResults.length > 0}
 			<Command.Group heading="Quick Links">
-				<Command.Item onSelect={() => handleResultClick('')}>
+				<Command.Item onSelect={() => handleResultClick('/SUMMARY')}>
 					<BookOpen class="mr-2 h-4 w-4" />
 					<span>Browse All Documentation</span>
 				</Command.Item>

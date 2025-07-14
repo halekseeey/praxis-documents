@@ -1,5 +1,5 @@
-import type { DocResolver } from '$lib/types/docs';
 import type { NavItem } from '$lib/types/nav';
+import { docsStore } from '$lib/stores/docs-store.svelte';
 
 class DocsNavigation {
 	private static instance: DocsNavigation;
@@ -15,53 +15,13 @@ class DocsNavigation {
 	}
 
 	public async generateNavigation(): Promise<NavItem[]> {
-		const modules = import.meta.glob(`/src/content/**/*.md`);
-		const flatItems: NavItem[] = [];
-
-		// First, collect all items in a flat structure
-		for (const [path, resolver] of Object.entries(modules)) {
-			try {
-				const doc = await (resolver as DocResolver)();
-
-				// console.log('doc', doc.default);
-
-				let href = `/docs${path.replace(/^\/src\/content/, '').replace(/\.md$/, '')}`;
-				href = href.replace(/\/index$/, '');
-
-				// Extract title from metadata or first heading
-				let title = '';
-				let disabled = false;
-				let external = false;
-				let label = '';
-
-				if (doc?.metadata?.title) {
-					// Use metadata if available
-					title = doc.metadata.title;
-					disabled = doc.metadata.disabled || false;
-					external = doc.metadata.external || false;
-					label = doc.metadata.label || '';
-				} else {
-					// Extract title from first heading in markdown content
-					// Since doc.default is a Svelte component, we need to get the raw content
-					// For now, we'll use the filename as fallback
-					const filename = path.split('/').pop()?.replace('.md', '') || '';
-					title = filename.charAt(0).toUpperCase() + filename.slice(1).replace(/[-_]/g, ' ');
-					if (!title) continue; // Skip if no title found
-				}
-
-				const item: NavItem = {
-					title,
-					href,
-					disabled,
-					external,
-					label
-				};
-
-				flatItems.push(item);
-			} catch (e) {
-				console.error(`Error processing ${path}:`, e);
-			}
-		}
+		const flatItems: NavItem[] = docsStore.getDocumentsForNavigation().map((doc) => ({
+			title: doc.title,
+			href: doc.href,
+			disabled: doc.disabled,
+			external: doc.external,
+			label: doc.label
+		}));
 
 		const nestedItems = this.createNestedStructure(flatItems);
 		this.docNav = this.cleanupEmptyItems(nestedItems);

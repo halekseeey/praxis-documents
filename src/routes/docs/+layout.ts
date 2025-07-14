@@ -1,8 +1,8 @@
-import { docsNavigation } from "$lib/components/doc-navigation.svelte";
-import { docsSearch } from "$lib/components/doc-search.svelte";
+import { docsStore } from '$lib/stores/docs-store.svelte';
+import { docsNavigation } from '$lib/components/doc-navigation.svelte';
 
 export async function load() {
-    await docsNavigation.generateNavigation();
-    await docsSearch.initializeSearchIndex();
-    return {};
+	await docsStore.initialize();
+	await docsNavigation.generateNavigation();
+	return {};
 }
