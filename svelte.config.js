@@ -62,6 +62,15 @@ const config = {
 								return;
 							}
 
+							// Handle image paths in links (for static assets)
+							if (node.url.startsWith('images/')) {
+								node.url = `/${node.url}`;
+								return;
+							} else if (node.url.startsWith('./images/')) {
+								node.url = `/${node.url.substring(2)}`;
+								return;
+							}
+
 							// Handle relative and absolute links within the project
 							if (node.url.startsWith('/')) {
 								// Absolute path - add docs prefix without double slash

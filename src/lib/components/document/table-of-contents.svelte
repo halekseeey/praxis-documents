@@ -19,13 +19,17 @@
 				<Button
 					variant="link"
 					href="#{heading.id}"
-					style="margin-left: {(heading.level - 1) * 1}rem"
-					class="font-base text-sm text-gray-800 dark:text-neutral-300"
+					class="font-base w-full !whitespace-normal text-sm text-gray-800 dark:text-neutral-300"
 				>
 					{#if heading.level > 1}
-						<ChevronRight class="mt-[5px] size-3.5 shrink-0" />
+						<ChevronRight
+							style="margin-left: {(heading.level - 1) * 1}rem"
+							class="mt-[5px] size-3.5 shrink-0"
+						/>
 					{/if}
-					{heading.text}
+					<div class="min-w-0 flex-1 overflow-hidden truncate text-ellipsis">
+						{heading.text}
+					</div>
 				</Button>
 			</li>
 		{/each}
