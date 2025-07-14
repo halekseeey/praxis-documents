@@ -16,14 +16,14 @@
 			{#if item.items?.length}
 				<Collapsible.Root>
 					<Sidebar.MenuItem>
-						<Collapsible.Trigger>
-							<Sidebar.MenuButton class="flex items-center gap-2 font-medium">
-								<Folder class="size-4" />
-								<span>{item.title}</span>
-								<ChevronRight
-									class="ml-auto size-3 transition-transform data-[state=open]:rotate-90"
-								/>
-							</Sidebar.MenuButton>
+						<Collapsible.Trigger
+							class="peer/menu-button ring-sidebar-ring hover:bg-sidebar-accent hover:text-sidebar-accent-foreground active:bg-sidebar-accent active:text-sidebar-accent-foreground data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground flex min-h-8 w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm font-medium outline-none transition-[width,height,padding] focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:font-medium group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0"
+						>
+							<Folder class="size-4" />
+							<span>{item.title}</span>
+							<ChevronRight
+								class="ml-auto size-3 transition-transform data-[state=open]:rotate-90"
+							/>
 						</Collapsible.Trigger>
 					</Sidebar.MenuItem>
 					<Collapsible.Content>
@@ -48,14 +48,12 @@
 		{#if item.items?.length}
 			<Collapsible.Root>
 				<Sidebar.MenuSubItem>
-					<Collapsible.Trigger>
-						<Sidebar.MenuSubButton class="flex items-center gap-2">
-							<Folder class="size-4" />
-							<span>{item.title}</span>
-							<ChevronRight
-								class="ml-auto size-3 transition-transform data-[state=open]:rotate-90"
-							/>
-						</Sidebar.MenuSubButton>
+					<Collapsible.Trigger
+						class="text-sidebar-foreground ring-sidebar-ring hover:bg-sidebar-accent hover:text-sidebar-accent-foreground active:bg-sidebar-accent active:text-sidebar-accent-foreground [&>svg]:text-sidebar-accent-foreground data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-accent-foreground flex h-fit min-h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md px-2 text-sm outline-none focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 group-data-[collapsible=icon]:hidden [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0"
+					>
+						<Folder class="size-4" />
+						<span>{item.title}</span>
+						<ChevronRight class="ml-auto size-3 transition-transform data-[state=open]:rotate-90" />
 					</Collapsible.Trigger>
 				</Sidebar.MenuSubItem>
 				<Collapsible.Content>
