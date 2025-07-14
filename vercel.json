@@ -1,0 +1,5 @@
+{
+  "buildCommand": "pnpm run build",
+  "outputDirectory": ".svelte-kit/static",
+  "framework": "sveltekit"
+} 
