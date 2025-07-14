@@ -9,14 +9,17 @@
 	let toc = $state(TableOfContents.getInstance());
 
 	async function highlightCode() {
-		console.log('highlightCode');
 		if (!contentRef || !highlighter) return;
 
 		const codeBlocks = contentRef.querySelectorAll('pre code');
-		for (const block of codeBlocks) {
-			// Skip if already highlighted
-			if (block.closest('pre')?.classList.contains('shiki')) continue;
+		const blocksToHighlight = Array.from(codeBlocks).filter(
+			(block) => !block.closest('pre')?.classList.contains('shiki')
+		);
 
+		if (blocksToHighlight.length === 0) return;
+
+		// Process all code blocks in parallel
+		const highlightPromises = blocksToHighlight.map(async (block) => {
 			const code = block.textContent || '';
 			let language = block.getAttribute('class')?.replace('language-', '') || 'text';
 
@@ -52,7 +55,10 @@
 					wrapper.style.backgroundColor = theme === 'github-dark' ? '#0d1117' : '#f6f8fa';
 				}
 			}
-		}
+		});
+
+		// Wait for all highlighting to complete
+		await Promise.all(highlightPromises);
 	}
 	onMount(() => {
 		if (contentRef) {

@@ -15,7 +15,11 @@ class DocsNavigation {
 	}
 
 	public async generateNavigation(): Promise<NavItem[]> {
-		const flatItems: NavItem[] = docsStore.getDocumentsForNavigation().map((doc) => ({
+		console.log('Generating navigation...');
+		const docs = docsStore.getDocumentsForNavigation();
+		console.log('Docs for navigation:', docs.length);
+
+		const flatItems: NavItem[] = docs.map((doc) => ({
 			title: doc.title,
 			href: doc.href,
 			disabled: doc.disabled,
@@ -25,6 +29,7 @@ class DocsNavigation {
 
 		const nestedItems = this.createNestedStructure(flatItems);
 		this.docNav = this.cleanupEmptyItems(nestedItems);
+		console.log('Navigation generated:', this.docNav.length, 'items');
 		return this.docNav;
 	}
 

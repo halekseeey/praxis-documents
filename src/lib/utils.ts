@@ -66,7 +66,9 @@ export function slugFromPath(path: string) {
 export async function getDoc(slug: string) {
 	const modules = import.meta.glob(`/src/content/**/*.md`);
 	const match = findMatch(slug, modules);
-	const doc = await match?.resolver?.();
+
+	// Use Promise.resolve to ensure async execution
+	const doc = await Promise.resolve(match?.resolver?.());
 
 	if (!doc) {
 		redirect(302, '/docs');

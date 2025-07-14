@@ -26,11 +26,12 @@ class DocsStore {
 	public async initialize(): Promise<void> {
 		if (this.isInitialized) return;
 
+		console.log('Initializing docs store...');
 		const modules = import.meta.glob(`/src/content/**/*.md`);
+		console.log('Found modules:', Object.keys(modules).length);
 
-		const docs: DocItem[] = [];
-
-		for (const [path, resolver] of Object.entries(modules)) {
+		// Process all files in parallel instead of sequentially
+		const docPromises = Object.entries(modules).map(async ([path, resolver]) => {
 			try {
 				const doc = await (resolver as DocResolver)();
 
@@ -58,22 +59,29 @@ class DocsStore {
 				}
 
 				if (title) {
-					docs.push({
+					return {
 						title,
 						slug,
 						href,
 						disabled,
 						external,
 						label
-					});
+					};
 				}
 			} catch (e) {
 				console.error(`Error processing ${path}:`, e);
 			}
-		}
+			return null;
+		});
 
+		// Wait for all promises to resolve and filter out null results
+		const results = await Promise.all(docPromises);
+		const docs = results.filter((doc): doc is NonNullable<typeof doc> => doc !== null);
+
+		console.log('Processed docs:', docs.length);
 		this.documents = docs;
 		this.isInitialized = true;
+		console.log('Docs store initialized');
 	}
 
 	public getDocuments(): DocItem[] {

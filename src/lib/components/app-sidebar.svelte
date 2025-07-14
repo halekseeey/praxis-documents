@@ -35,7 +35,18 @@
 	</Sidebar.Header>
 	<Sidebar.Content>
 		<Sidebar.Group>
-			<SidebarRecursiveMenu items={docsNavigation.docNav} />
+			{#if docsNavigation.docNav.length > 0}
+				<SidebarRecursiveMenu items={docsNavigation.docNav} />
+			{:else}
+				<!-- Loading state for navigation -->
+				<div class="px-3 py-2">
+					<div class="space-y-2">
+						<div class="h-4 animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
+						<div class="h-4 w-3/4 animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
+						<div class="h-4 w-1/2 animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
+					</div>
+				</div>
+			{/if}
 		</Sidebar.Group>
 	</Sidebar.Content>
 	<div class="block sm:hidden">

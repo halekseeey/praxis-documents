@@ -3,35 +3,19 @@
 	import Separator from '../ui/separator/separator.svelte';
 	import DocContent from './doc-content.svelte';
 	import DocHeader from './doc-header.svelte';
-	import { createHighlighter } from 'shiki/bundle/web';
+	import { getHighlighter } from '../../utils/highlighter-cache.js';
 	import { mode } from 'mode-watcher';
 	import TableOfContents from './table-of-contents.svelte';
 	import MobileTableOfContents from './mobile-table-of-contents.svelte';
 
 	let highlighter: any = $state();
+
 	let { title, description, data }: { title: string; description: string; data: any } = $props();
 	let theme = $derived($mode);
 	let contentKey = $derived(`${theme}-${title}`);
 
 	onMount(async () => {
-		highlighter = await createHighlighter({
-			themes: ['github-dark', 'github-light'],
-			langs: [
-				'typescript',
-				'javascript',
-				'bash',
-				'markdown',
-				'json',
-				'html',
-				'css',
-				'svelte',
-				'shell',
-				'tsx',
-				'python'
-			]
-		});
-
-		// Event listeners no longer needed with sticky positioning
+		highlighter = await getHighlighter();
 	});
 </script>
 
@@ -54,6 +38,18 @@
 					<MobileTableOfContents />
 				</div>
 				<!-- <PromoCard /> -->
+			</div>
+		</div>
+	</div>
+{:else}
+	<!-- Loading state while highlighter initializes -->
+	<div class="relative flex flex-col gap-6 sm:flex-row">
+		<div class="min-w-0 flex-1 overflow-hidden">
+			<div class="animate-pulse">
+				<div class="mb-4 h-8 rounded bg-gray-200 dark:bg-gray-700"></div>
+				<div class="mb-2 h-4 rounded bg-gray-200 dark:bg-gray-700"></div>
+				<div class="mb-2 h-4 rounded bg-gray-200 dark:bg-gray-700"></div>
+				<div class="mb-2 h-4 rounded bg-gray-200 dark:bg-gray-700"></div>
 			</div>
 		</div>
 	</div>
