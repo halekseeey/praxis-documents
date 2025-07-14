@@ -1,4 +1,4 @@
-import { error } from '@sveltejs/kit';
+import { redirect } from '@sveltejs/kit';
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import type { DocResolver } from './types/docs';
@@ -69,7 +69,7 @@ export async function getDoc(slug: string) {
 	const doc = await match?.resolver?.();
 
 	if (!doc) {
-		error(404);
+		redirect(302, '/docs');
 	}
 
 	// If no metadata, create default metadata from the content

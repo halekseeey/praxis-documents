@@ -69,60 +69,56 @@ class DocsNavigation {
 	}
 
 	private createNestedStructure(items: NavItem[]): NavItem[] {
-		const root: NavItem[] = [];
-		const folderMap = new Map<string, NavItem>();
-		const allPaths = items.map((i) => i.href);
-		// Sort items so parent paths come before children
-		items.sort((a, b) => (a.href?.split('/').length ?? 0) - (b.href?.split('/').length ?? 0));
-
-		items.forEach((item) => {
-			if (!item.href) {
-				root.push(item);
+		// Вспомогательная функция для вложенного построения
+		function insert(tree: NavItem[], pathParts: string[], item: NavItem) {
+			if (pathParts.length === 0) {
+				tree.push(item);
 				return;
 			}
-
-			const pathParts = item.href.split('/').filter(Boolean);
-
-			// Skip the 'docs' part as it's common to all
-			if (pathParts[0] === 'docs') {
-				pathParts.shift();
+			const folderName = pathParts[0];
+			let folder = tree.find((n) => n.title === folderName && n.items);
+			if (!folder) {
+				folder = {
+					title: folderName,
+					items: []
+				};
+				tree.push(folder);
 			}
+			insert(folder.items!, pathParts.slice(1), item);
+		}
 
-			if (pathParts.length === 0) {
-				// This is the root level index
-				root.push(item);
+		const tree: NavItem[] = [];
+		for (const item of items) {
+			if (!item.href) {
+				tree.push(item);
+				continue;
+			}
+			// Убираем /docs в начале
+			let rel = item.href.replace(/^\/docs\/?/, '');
+			const pathParts = rel.split('/').filter(Boolean);
+			if (pathParts.length === 1) {
+				tree.push(item);
 			} else {
-				const currentFolder = pathParts[0];
-				const isIndex = pathParts.length === 1;
-				// Filter paths that start with this folder
-				const childPaths = allPaths.filter(
-					(path) => path?.startsWith(`/docs/${currentFolder}/`) || path === `/docs/${currentFolder}`
-				);
-
-				// A folder is considered single if it has exactly one entry (itself)
-				const isSingle = childPaths.length === 1;
-				if (isIndex && isSingle) {
-					// This is a root level item
-					root.push(item);
-				} else {
-					// Check if we need to create a folder
-					if (!folderMap.has(currentFolder)) {
-						const folderItem: NavItem = {
-							title: currentFolder.charAt(0).toUpperCase() + currentFolder.slice(1),
-							items: []
-						};
-						folderMap.set(currentFolder, folderItem);
-						root.push(folderItem);
-					}
-
-					const folder = folderMap.get(currentFolder);
-					if (folder?.items) {
-						folder.items.push(item);
-					}
-				}
+				// Последний сегмент — файл, предыдущие — папки
+				insert(tree, pathParts.slice(0, -1), {
+					...item,
+					href: item.href
+				});
 			}
-		});
-		return this.sortNavItems(root);
+		}
+		// Рекурсивно сортируем
+		function sortNav(items: NavItem[]): NavItem[] {
+			return items
+				.sort((a, b) => {
+					// Папки (с items) всегда выше файлов (без items)
+					if (a.items && !b.items) return -1;
+					if (!a.items && b.items) return 1;
+					// Если оба папки или оба файлы, сортируем по алфавиту
+					return (a.title || '').localeCompare(b.title || '');
+				})
+				.map((item) => (item.items ? { ...item, items: sortNav(item.items) } : item));
+		}
+		return sortNav(tree);
 	}
 
 	// Clean up empty items arrays

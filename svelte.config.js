@@ -13,7 +13,7 @@ const config = {
 				dashes: 'oldschool'
 			},
 			remarkPlugins: [
-				// Экранирование < и >
+				// Escaping < and >
 				() => (tree) => {
 					const visit = (node) => {
 						if (node.type === 'text' && /[<>]/.test(node.value)) {
@@ -23,7 +23,7 @@ const config = {
 					};
 					visit(tree);
 				},
-				// Экранирование фигурных скобок { и }
+				// Escaping curly braces { and }
 				() => (tree) => {
 					const visit = (node) => {
 						if (node.type === 'text' && /[{}]/.test(node.value)) {
@@ -33,11 +33,60 @@ const config = {
 					};
 					visit(tree);
 				},
-				// Исправление путей к изображениям
+				// Fix image paths
 				() => (tree) => {
 					const visit = (node) => {
-						if (node.type === 'image' && node.url && node.url.startsWith('images/')) {
-							node.url = `/${node.url}`;
+						if (node.type === 'image' && node.url) {
+							// Handle both 'images/' and './images/' paths
+							if (node.url.startsWith('images/')) {
+								node.url = `/${node.url}`;
+							} else if (node.url.startsWith('./images/')) {
+								node.url = `/${node.url.substring(2)}`;
+							}
+						}
+						if (node.children) node.children.forEach(visit);
+					};
+					visit(tree);
+				},
+				// Link processing - adding docs prefix
+				() => (tree) => {
+					const visit = (node) => {
+						if (node.type === 'link' && node.url) {
+							// Skip external links (http, https, mailto, etc.)
+							if (
+								node.url.startsWith('http') ||
+								node.url.startsWith('mailto:') ||
+								node.url.startsWith('tel:') ||
+								node.url.startsWith('#')
+							) {
+								return;
+							}
+
+							// Handle relative and absolute links within the project
+							if (node.url.startsWith('/')) {
+								// Absolute path - add docs prefix without double slash
+								node.url = `/docs/${node.url}`;
+							} else if (
+								!node.url.startsWith('http') &&
+								!node.url.startsWith('mailto:') &&
+								!node.url.startsWith('tel:') &&
+								!node.url.startsWith('#')
+							) {
+								// Relative path - add docs prefix
+								// For relative paths, we need to handle them based on the current file context
+								// This will be handled by the frontend routing logic
+								node.url = `${node.url}`;
+							}
+
+							// Remove trailing slash if present
+							if (node.url.endsWith('/') && node.url !== '/docs/') {
+								node.url = node.url.slice(0, -1);
+							}
+
+							// Remove .md extension if present
+							if (node.url.endsWith('.md')) {
+								node.url = node.url.slice(0, -3);
+							}
 						}
 						if (node.children) node.children.forEach(visit);
 					};

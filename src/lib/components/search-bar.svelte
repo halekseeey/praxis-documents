@@ -48,10 +48,10 @@
 	onclick={handleSearchClick}
 >
 	<div class="flex items-center gap-2">
-		<SearchIcon class="h-4 w-4 text-muted-foreground" />
-		<p class="hidden text-sm text-muted-foreground sm:block">Search documentation</p>
+		<SearchIcon class="text-muted-foreground h-4 w-4" />
+		<p class="text-muted-foreground hidden text-sm sm:block">Search documentation</p>
 		<kbd
-			class="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100"
+			class="bg-muted text-muted-foreground pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border px-1.5 font-mono text-[10px] font-medium opacity-100"
 		>
 			<span class="text-xs">⌘</span>K
 		</kbd>
@@ -82,7 +82,7 @@
 						<FileText class="mt-0.5 h-4 w-4 shrink-0" />
 						<div class="flex flex-col gap-1">
 							<span class="font-medium">{result.title}</span>
-							<span class="line-clamp-2 text-sm text-muted-foreground">
+							<span class="text-muted-foreground line-clamp-2 text-sm">
 								{result.description}
 							</span>
 						</div>

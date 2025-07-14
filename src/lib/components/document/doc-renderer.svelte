@@ -13,12 +13,6 @@
 	let theme = $derived($mode);
 	let contentKey = $derived(`${theme}-${title}`);
 
-	let sidebar: HTMLElement | null = $state(null);
-	let sidebarContent: HTMLElement | null = $state(null);
-
-	// Cleanup function for event listeners
-	let cleanup: (() => void) | null = $state(null);
-
 	onMount(async () => {
 		highlighter = await createHighlighter({
 			themes: ['github-dark', 'github-light'],
@@ -37,57 +31,24 @@
 			]
 		});
 
-		function handleScroll() {
-			if (!sidebar || !sidebarContent) return;
-			const scrollTop = window.scrollY;
-			const viewportHeight = window.innerHeight;
-			const contentHeight = sidebarContent.getBoundingClientRect().height;
-			const sidebarTop = sidebar.getBoundingClientRect().top + window.pageYOffset;
-
-			// If reached the bottom of the document, fix above the footer
-			if (scrollTop >= contentHeight - viewportHeight + sidebarTop) {
-				sidebarContent.style.transform = `translateY(-${contentHeight - viewportHeight + sidebarTop}px)`;
-				sidebarContent.style.position = 'fixed';
-			} else {
-				sidebarContent.style.transform = '';
-				sidebarContent.style.position = '';
-			}
-		}
-
-		window.addEventListener('scroll', handleScroll);
-		window.addEventListener('resize', handleScroll);
-
-		handleScroll();
-
-		cleanup = () => {
-			window.removeEventListener('scroll', handleScroll);
-			window.removeEventListener('resize', handleScroll);
-		};
-	});
-
-	onDestroy(() => {
-		if (cleanup) {
-			cleanup();
-		}
+		// Event listeners no longer needed with sticky positioning
 	});
 </script>
 
 {#if highlighter}
-	<div class="flex flex-col gap-6 sm:flex-row">
+	<div class="relative flex flex-col gap-6 sm:flex-row">
 		<div class="min-w-0 flex-1 overflow-hidden">
-			<DocHeader {title} {description} />
+			<!-- <DocHeader {title} {description} /> -->
 
 			{#key contentKey}
 				<DocContent {highlighter} {theme} {data} />
 			{/key}
 		</div>
 		<div>
-			<div class="flex w-72 flex-col gap-4">
-				<div bind:this={sidebar} class="sidebar hidden overflow-x-hidden sm:block">
-					<div bind:this={sidebarContent} class="content-wrapper">
-						<TableOfContents />
-						<Separator />
-					</div>
+			<div class=" sticky top-20 flex w-72 flex-col gap-4">
+				<div class="sidebar hidden overflow-x-hidden sm:block">
+					<TableOfContents />
+					<Separator />
 				</div>
 				<div class="block sm:hidden">
 					<MobileTableOfContents />

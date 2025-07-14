@@ -7,6 +7,7 @@
 	import { docsNavigation } from '$lib/components/doc-navigation.svelte';
 	import { page } from '$app/state';
 	import SocialMedia from './social-media.svelte';
+	import SidebarRecursiveMenu from './sidebar-recursive-menu.svelte';
 	const path = $derived(page.url.pathname);
 </script>
 
@@ -34,32 +35,7 @@
 	</Sidebar.Header>
 	<Sidebar.Content>
 		<Sidebar.Group>
-			<Sidebar.Menu>
-				{#each docsNavigation.docNav as groupItem (groupItem.title)}
-					<Sidebar.MenuItem>
-						<Sidebar.MenuButton class="font-medium" isActive={path === groupItem.href}>
-							{#snippet child({ props })}
-								<a href={groupItem.href} {...props}>
-									{groupItem.title}
-								</a>
-							{/snippet}
-						</Sidebar.MenuButton>
-						{#if groupItem.items?.length}
-							<Sidebar.MenuSub>
-								{#each groupItem.items as item (item.title)}
-									<Sidebar.MenuSubItem>
-										<Sidebar.MenuSubButton isActive={path === item.href}>
-											{#snippet child({ props })}
-												<a href={item.href} {...props}>{item.title}</a>
-											{/snippet}
-										</Sidebar.MenuSubButton>
-									</Sidebar.MenuSubItem>
-								{/each}
-							</Sidebar.MenuSub>
-						{/if}
-					</Sidebar.MenuItem>
-				{/each}
-			</Sidebar.Menu>
+			<SidebarRecursiveMenu items={docsNavigation.docNav} />
 		</Sidebar.Group>
 	</Sidebar.Content>
 	<div class="block sm:hidden">
