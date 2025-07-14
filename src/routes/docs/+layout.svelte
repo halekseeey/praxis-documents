@@ -62,14 +62,24 @@
 			</div>
 		</header>
 		<div
-			class="flex flex-col gap-4 p-4 ease-linear"
+			class="content-container flex flex-col gap-4 p-4 ease-linear"
 			class:duration-200={withTransition}
 			class:transition-all={withTransition}
-			style="max-width: {!sidebarState.isMobile && sidebarState.isOpen
-				? 'calc(100vw - 16rem)'
-				: '100vw'}"
+			style="--sidebar-open: {sidebarState.isOpen ? '1' : '0'}"
 		>
 			{@render children()}
 		</div>
 	</Sidebar.Inset>
 </Sidebar.Provider>
+
+<style>
+	.content-container {
+		max-width: 100vw;
+	}
+
+	@media (min-width: 768px) {
+		.content-container {
+			max-width: calc(100vw - (16rem * var(--sidebar-open, 0)));
+		}
+	}
+</style>

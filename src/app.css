@@ -101,6 +101,10 @@
 		font-size: 0.875em;
 	}
 
+	.prose h1 {
+		line-break: anywhere;
+	}
+
 	.prose code::before,
 	.prose code::after {
 		content: '' !important;

@@ -43,7 +43,7 @@
 	</div>
 {:else}
 	<!-- Loading state while highlighter initializes -->
-	<div class="relative flex flex-col gap-6 sm:flex-row">
+	<div class="w-[calc(100vw + 16rem)] relative flex flex-col gap-6 sm:flex-row">
 		<div class="min-w-0 flex-1 overflow-hidden">
 			<div class="animate-pulse">
 				<div class="mb-4 h-8 rounded bg-gray-200 dark:bg-gray-700"></div>
