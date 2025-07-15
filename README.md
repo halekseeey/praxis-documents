@@ -1,140 +1,62 @@
-# Documentation Template
+# Praxis Documentation
 
-A modern documentation template built with Svelte 5, MDSvex, and Tailwind CSS.
-
-[Template Preview](https://svelte-docs.codegio.com/)
-
-## Overview
-
-Create beautiful, modern documentation sites with minimal setup. This template combines the power of Svelte 5 with the flexibility of Markdown to deliver a superior documentation experience.
-
-## Features
-
-- **📚 MDSvex Integration** - Write documentation in Markdown with Svelte components
-- **🎨 Modern Design** - Built with Tailwind CSS and shadcn/ui components
-- **🌙 Dark Mode** - Automatic dark mode with system preference detection
-- **🔍 Search** - Built-in search functionality powered by FlexSearch
-- **📱 Responsive** - Mobile-first design that works on all devices
-- **📑 Auto-Navigation** - Automatic documentation structure generation
-- **📖 Table of Contents** - Dynamic table of contents for each page
-- **⚡ Fast** - Optimized for speed and performance
-- **🔒 Type Safe** - Full TypeScript support
-
-## Quick Start
-
-1. Click the green "Use this template" button
-2. Create a new repository
-3. Clone your repository:
-   ```bash
-   git clone https://github.com/yourusername/your-repo-name.git
-   ```
-4. Install dependencies:
-   ```bash
-   cd your-repo-name
-   npm install
-   ```
-5. Start the development server:
-   ```bash
-   npm run dev
-   ```
+This is the deployed documentation for the Praxis project. It is designed to be clear and user-friendly, supporting both light and dark themes as well as full responsiveness for mobile and desktop devices.
 
 ## Project Structure
 
-```
-your-project/
-├── src/
-│   ├── content/          # Documentation markdown files
-│   ├── lib/
-│   │   ├── components/   # Core components
-│   │   │   ├── document/ # Document-related components
-│   │   │   ├── home/     # Home page components
-│   │   │   └── ui/       # UI components
-│   │   ├── hooks/        # Custom hooks
-│   │   ├── types/        # TypeScript type definitions
-│   │   ├── config.ts     # Site configuration
-│   │   ├── index.ts      # Library exports
-│   │   └── utils.ts      # Utility functions
-│   ├── routes/           # SvelteKit routes
-│   ├── app.css          # Global styles
-│   ├── app.d.ts         # TypeScript declarations
-│   └── app.html         # HTML template
-└── static/              # Static assets
+- All documentation is stored in the `src/content` folder as Markdown (`.md`) files.
+- The structure of the `src/content` folder reflects the navigation structure of the documentation.
+- Subfolders are used for organization (for example, `core-concepts`, `getting-started`, `tools`, etc.).
+- For a directory to appear in the navigation bar, it must contain at least one `.md` file.
+- If the only file in the directory is named `coming-soon.md`, the directory will still be shown in the navigation, but navigation to this file will be disabled (the section will be marked as "coming soon").
+
+## Working with Images
+
+- All images used in the documentation must be stored in the `static/images` folder.
+- Links to images in Markdown files must start with `images/`.
+- Example of inserting an image:
+
+```md
+![Image description](images/diagrams/example_agent.png)
 ```
 
-## Writing Documentation
+## Cross-page Links
 
-Place your markdown files in the `src/content` directory. The folder structure will automatically generate the navigation.
+- To create links to other documentation pages, use the absolute path from the root, without specifying the `content` folder.
+- Example of a cross-page link to the page `core-concepts/agents.md`:
 
-```markdown
----
-title: Getting Started
-description: Learn how to use this template
----
-
-# Getting Started
-
-Write your documentation here...
+```md
+[Read more about agents](core-concepts/agents.md)
 ```
 
-## Customization
+- Do not use relative paths and do not include the `content` folder in links.
 
-### Themes
+## Example Structure
 
-Modify the theme in `src/app.css` or use pre-built themes from [shadcn-svelte](https://next.shadcn-svelte.com/themes).
-
-### Components
-
-Customize components in `src/lib/components` to match your brand.
-
-### Configuration
-
-Update site settings in `src/lib/config`:
-
-```typescript
-export const siteConfig = {
-	title: 'Your Documentation',
-	description: 'Your site description'
-	// ...other settings
-};
+```
+src/content/
+  core-concepts/
+    agents.md
+    overview.md
+  getting-started/
+    quickstart.md
+  tools/
+    openai_request.md
+  providers/
+    coming_soon.md
 ```
 
-## Development
+## Configuration File
 
-```bash
-# Start development server
-npm run dev
+- The file `src/lib/config` is used to configure the documentation site.
+- In this file, you can:
+  - Specify the order of top-level documentation sections for navigation.
+  - Set links to social networks.
+  - Set the documentation version.
 
-# Build for production
-npm run build
+## Summary of Rules
 
-# Preview production build
-npm run preview
-```
-
-## Deployment
-
-This template can be deployed to any static hosting platform:
-
-- Vercel
-- Netlify
-- GitHub Pages
-- Cloudflare Pages
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## License
-
-MIT License - use this template for any project.
-
-## Acknowledgments
-
-- [Svelte](https://svelte.dev)
-- [shadcn-svelte](https://next.shadcn-svelte.com)
-- [Tailwind CSS](https://tailwindcss.com)
-- [MDSvex](https://mdsvex.com)
-
-## Support
-
-Need help with your documentation? [Contact us](mailto:info@codegio.com).
+- All `.md` files — only in `src/content`.
+- All images — only in `static/images`.
+- Image links — must start with `images/`.
+- Cross-page links — use absolute paths, without `content`.

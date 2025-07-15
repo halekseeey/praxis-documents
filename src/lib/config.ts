@@ -1,7 +1,6 @@
-import type { NavItem, SocialLink } from '$lib/types/nav';
+import type { SocialLink } from '$lib/types/nav';
 
-import { Boxes, Paintbrush, Workflow, Zap } from 'lucide-svelte';
-import type { Feature, PromoConfig, SiteConfig } from './types/config';
+import type { PromoConfig, SiteConfig } from './types/config';
 
 export const topLevelOrder = [
 	'Getting Started',
@@ -15,27 +14,8 @@ export const topLevelOrder = [
 
 export const siteConfig: SiteConfig = {
 	version: '0.0.1',
-	title: 'Documentation',
-	description:
-		'Comprehensive documentation for your project. Built with Svelte 5, MDSvex, Tailwind CSS, and shadcn/ui components.',
-	github: 'https://github.com/code-gio/svelte-firekit-docs',
-	npm: '',
-
-	quickLinks: [
-		{ title: 'Customize', href: '/docs/customize' },
-		{ title: 'Examples', href: '/docs/examples' }
-	],
-	logo: '/logo.svg',
-	logoDark: '/logo-white.svg',
-	favicon: '/favicon.png'
+	title: 'Documentation'
 };
-
-export let navItems: NavItem[] = [
-	{
-		title: 'Docs',
-		href: '/docs'
-	}
-];
 
 export let socialLinks: SocialLink[] = [
 	// {
@@ -47,33 +27,6 @@ export let socialLinks: SocialLink[] = [
 		title: 'GitHub',
 		href: 'https://github.com/code-gio',
 		icon: 'github'
-	}
-];
-
-export const features: Feature[] = [
-	{
-		icon: Boxes,
-		title: 'Component Library',
-		description:
-			'Built on top of shadcn/ui, offering comprehensive accessible components with complete documentation'
-	},
-	{
-		icon: Workflow,
-		title: 'Type Safe',
-		description:
-			'Fully typed with TypeScript, providing excellent IDE support and reliable development experience'
-	},
-	{
-		icon: Paintbrush,
-		title: 'Fully Customizable',
-		description:
-			'Easily customize themes, layouts, and components to match your brand identity and requirements'
-	},
-	{
-		icon: Zap,
-		title: 'Fast & Modern',
-		description:
-			'Powered by Svelte 5, MDSvex, and TailwindCSS for optimal performance and developer experience'
 	}
 ];
 
