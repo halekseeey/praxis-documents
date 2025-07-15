@@ -26,7 +26,7 @@ This is the deployed documentation for the Praxis project. It is designed to be 
 - Example of a cross-page link to the page `core-concepts/agents.md`:
 
 ```md
-[Read more about agents](core-concepts/agents.md)
+[Read more about agents](/core-concepts/agents.md)
 ```
 
 - Do not use relative paths and do not include the `content` folder in links.

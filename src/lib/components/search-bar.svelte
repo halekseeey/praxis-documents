@@ -23,7 +23,7 @@
 		open = false;
 		docsSearch.clearSearch();
 
-		goto(`/docs${slug}`);
+		goto(`${slug}`);
 	}
 
 	onMount(() => {

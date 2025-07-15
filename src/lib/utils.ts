@@ -71,7 +71,7 @@ export async function getDoc(slug: string) {
 	const doc = await Promise.resolve(match?.resolver?.());
 
 	if (!doc) {
-		redirect(302, '/docs');
+		redirect(302, '/');
 	}
 
 	// If no metadata, create default metadata from the content

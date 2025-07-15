@@ -34,7 +34,7 @@ class DocsStore {
 				const doc = await (resolver as DocResolver)();
 
 				// Extract href and slug from path
-				let href = `/docs${path.replace(/^\/src\/content/, '').replace(/\.md$/, '')}`;
+				let href = `${path.replace(/^\/src\/content/, '').replace(/\.md$/, '')}`;
 				href = href.replace(/\/index$/, '');
 				let slug = path.replace(/^\/src\/content/, '').replace(/\.md$/, '');
 				slug = slug.replace(/\/index$/, '');

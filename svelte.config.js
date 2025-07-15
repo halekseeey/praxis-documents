@@ -48,7 +48,7 @@ const config = {
 					};
 					visit(tree);
 				},
-				// Link processing - adding docs prefix
+
 				() => (tree) => {
 					const visit = (node) => {
 						if (node.type === 'link' && node.url) {
@@ -71,24 +71,8 @@ const config = {
 								return;
 							}
 
-							// Handle relative and absolute links within the project
-							if (node.url.startsWith('/')) {
-								// Absolute path - add docs prefix without double slash
-								node.url = `/docs/${node.url}`;
-							} else if (
-								!node.url.startsWith('http') &&
-								!node.url.startsWith('mailto:') &&
-								!node.url.startsWith('tel:') &&
-								!node.url.startsWith('#')
-							) {
-								// Relative path - add docs prefix
-								// For relative paths, we need to handle them based on the current file context
-								// This will be handled by the frontend routing logic
-								node.url = `${node.url}`;
-							}
-
 							// Remove trailing slash if present
-							if (node.url.endsWith('/') && node.url !== '/docs/') {
+							if (node.url.endsWith('/') && node.url !== '/') {
 								node.url = node.url.slice(0, -1);
 							}
 
