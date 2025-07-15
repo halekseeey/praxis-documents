@@ -13,7 +13,15 @@
 {#if level === 0}
 	<Sidebar.Menu>
 		{#each items as item (item.href ?? item.title)}
-			{#if item.items?.length}
+			{#if item.title === 'Home'}
+				<Sidebar.MenuItem>
+					<Sidebar.MenuButton style="" isActive={path === item.href}>
+						{#snippet child({ props })}
+							<a href={item.href} {...props}>{item.title}</a>
+						{/snippet}
+					</Sidebar.MenuButton>
+				</Sidebar.MenuItem>
+			{:else if item.items?.length}
 				<Collapsible.Root>
 					<Sidebar.MenuItem>
 						<Collapsible.Trigger
@@ -36,7 +44,11 @@
 				<Sidebar.MenuItem>
 					<Sidebar.MenuButton class="font-medium" isActive={path === item.href}>
 						{#snippet child({ props })}
-							<a href={item.href} {...props}>{item.title}</a>
+							{#if item.title && item.title.toLowerCase() === 'coming soon'}
+								<span style="cursor: not-allowed;">{item.title}</span>
+							{:else}
+								<a href={item.href} {...props}>{item.title}</a>
+							{/if}
 						{/snippet}
 					</Sidebar.MenuButton>
 				</Sidebar.MenuItem>
@@ -66,7 +78,11 @@
 			<Sidebar.MenuSubItem>
 				<Sidebar.MenuSubButton isActive={path === item.href}>
 					{#snippet child({ props })}
-						<a href={item.href} {...props}>{item.title}</a>
+						{#if item.title && item.title.toLowerCase() === 'coming soon'}
+							<span style="cursor: not-allowed;" {...props}>{item.title}</span>
+						{:else}
+							<a href={item.href} {...props}>{item.title}</a>
+						{/if}
 					{/snippet}
 				</Sidebar.MenuSubButton>
 			</Sidebar.MenuSubItem>

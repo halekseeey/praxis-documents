@@ -1,5 +1,6 @@
 import type { NavItem } from '$lib/types/nav';
 import { docsStore } from '$lib/stores/docs-store.svelte';
+import { topLevelOrder } from '$lib/config';
 
 class DocsNavigation {
 	private static instance: DocsNavigation;
@@ -31,17 +32,21 @@ class DocsNavigation {
 	}
 
 	private createNestedStructure(items: NavItem[]): NavItem[] {
-		// Вспомогательная функция для вложенного построения
+		function prettifyFolderName(name: string): string {
+			return name.replace(/[-_]/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
+		}
+
 		function insert(tree: NavItem[], pathParts: string[], item: NavItem) {
 			if (pathParts.length === 0) {
 				tree.push(item);
 				return;
 			}
 			const folderName = pathParts[0];
-			let folder = tree.find((n) => n.title === folderName && n.items);
+			const prettyFolderName = prettifyFolderName(folderName);
+			let folder = tree.find((n) => n.title === prettyFolderName && n.items);
 			if (!folder) {
 				folder = {
-					title: folderName,
+					title: prettyFolderName,
 					items: []
 				};
 				tree.push(folder);
@@ -55,13 +60,12 @@ class DocsNavigation {
 				tree.push(item);
 				continue;
 			}
-			// Убираем /docs в начале
+
 			let rel = item.href.replace(/^\/docs\/?/, '');
 			const pathParts = rel.split('/').filter(Boolean);
 			if (pathParts.length === 1) {
 				tree.push(item);
 			} else {
-				// Последний сегмент — файл, предыдущие — папки
 				insert(tree, pathParts.slice(0, -1), {
 					...item,
 					href: item.href
@@ -69,18 +73,34 @@ class DocsNavigation {
 			}
 		}
 		// Рекурсивно сортируем
-		function sortNav(items: NavItem[]): NavItem[] {
+		function sortNav(items: NavItem[], level = 0): NavItem[] {
 			return items
 				.sort((a, b) => {
-					// Папки (с items) всегда выше файлов (без items)
+					if (level === 0) {
+						if (a.title === 'Home' && b.title !== 'Home') return -1;
+						if (b.title === 'Home' && a.title !== 'Home') return 1;
+
+						if (a.items && b.items) {
+							const aIdx = topLevelOrder.indexOf(a.title || '');
+							const bIdx = topLevelOrder.indexOf(b.title || '');
+							if (aIdx !== -1 && bIdx !== -1) return aIdx - bIdx;
+							if (aIdx !== -1) return -1;
+							if (bIdx !== -1) return 1;
+						}
+
+						if (a.items && !b.items) return -1;
+						if (!a.items && b.items) return 1;
+
+						return (a.title || '').localeCompare(b.title || '');
+					}
+
 					if (a.items && !b.items) return -1;
 					if (!a.items && b.items) return 1;
-					// Если оба папки или оба файлы, сортируем по алфавиту
 					return (a.title || '').localeCompare(b.title || '');
 				})
-				.map((item) => (item.items ? { ...item, items: sortNav(item.items) } : item));
+				.map((item) => (item.items ? { ...item, items: sortNav(item.items, level + 1) } : item));
 		}
-		return sortNav(tree);
+		return sortNav(tree, 0);
 	}
 
 	// Clean up empty items arrays

@@ -3,6 +3,16 @@ import type { NavItem, SocialLink } from '$lib/types/nav';
 import { Boxes, Paintbrush, Workflow, Zap } from 'lucide-svelte';
 import type { Feature, PromoConfig, SiteConfig } from './types/config';
 
+export const topLevelOrder = [
+	'Getting Started',
+	'Core Concepts',
+	'Tokenomics',
+	'Agents',
+	'Tools',
+	'Providers',
+	'Services'
+];
+
 export const siteConfig: SiteConfig = {
 	version: '0.0.1',
 	title: 'Documentation',
