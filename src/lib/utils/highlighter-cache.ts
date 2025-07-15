@@ -1,4 +1,5 @@
 import { createHighlighter } from 'shiki/bundle/web';
+import { supportedCodeLanguages } from '$lib/config';
 
 let globalHighlighter: any = null;
 let highlighterPromise: Promise<any> | null = null;
@@ -14,19 +15,7 @@ export async function getHighlighter() {
 
 	highlighterPromise = createHighlighter({
 		themes: ['github-dark', 'github-light'],
-		langs: [
-			'typescript',
-			'javascript',
-			'bash',
-			'markdown',
-			'json',
-			'html',
-			'css',
-			'svelte',
-			'shell',
-			'tsx',
-			'python'
-		]
+		langs: supportedCodeLanguages
 	});
 
 	globalHighlighter = await highlighterPromise;

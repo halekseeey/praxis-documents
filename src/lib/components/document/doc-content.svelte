@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { TableOfContents } from './toc.svelte.js';
+	import { supportedCodeLanguages } from '$lib/config';
 
 	let contentRef: HTMLElement | undefined = $state();
 	let { highlighter, theme, data }: { highlighter: any; theme: string | undefined; data: any } =
@@ -21,11 +22,16 @@
 		// Process all code blocks in parallel
 		const highlightPromises = blocksToHighlight.map(async (block) => {
 			const code = block.textContent || '';
-			let language = block.getAttribute('class')?.replace('language-', '') || 'text';
+			let language = block.getAttribute('class')?.replace('language-', '') || 'plaintext';
 
 			// Normalize language names
 			if (['python3', 'py'].includes(language)) {
 				language = 'python';
+			}
+
+			// Список поддерживаемых языков теперь берём из config.ts
+			if (!supportedCodeLanguages.includes(language)) {
+				language = 'plaintext';
 			}
 
 			try {

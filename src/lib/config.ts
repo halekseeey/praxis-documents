@@ -86,3 +86,18 @@ export let promoConfig: PromoConfig = {
 	lightImage: '/images/dev-services-light.jpg',
 	darkImage: '/images/dev-services-dark.jpg'
 };
+
+export const supportedCodeLanguages = [
+	'typescript',
+	'javascript',
+	'bash',
+	'markdown',
+	'json',
+	'html',
+	'css',
+	'svelte',
+	'shell',
+	'tsx',
+	'python',
+	'plaintext'
+];
