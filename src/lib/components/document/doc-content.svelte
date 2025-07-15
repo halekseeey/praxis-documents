@@ -69,7 +69,14 @@
 	onMount(() => {
 		if (contentRef) {
 			toc.updateContentRef(contentRef);
-			// Small delay to ensure content is fully rendered
+			setTimeout(() => {
+				highlightCode();
+			}, 0);
+		}
+	});
+
+	$effect(() => {
+		if (contentRef && highlighter && theme && data) {
 			setTimeout(() => {
 				highlightCode();
 			}, 0);
