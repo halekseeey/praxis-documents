@@ -47,7 +47,7 @@
 
 			setTimeout(() => {
 				withTransition = false;
-			}, 0);
+			}, 200);
 		}}
 	>
 		<AppSidebar />
